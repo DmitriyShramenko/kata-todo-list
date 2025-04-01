@@ -1,25 +1,25 @@
-import React from "react";
+import React, { Component } from "react";
 
 import './tasks-filter.css';
 
-const TasksFilter = () => {
+class TasksFilter extends Component {
+	render() {
 
-	return (
+		return (
 
-		<ul className="filters">
-			<li>
-				<button className="selected">All</button>
-			</li>
-			<li>
-				<button>Active</button>
-			</li>
-			<li>
-				<button>Completed</button>
-			</li>
-		</ul>
-
-	);
-
-};
+			<ul className="filters">
+				<li>
+					<button className="selected">All</button>
+				</li>
+				<li>
+					<button>Active</button>
+				</li>
+				<li>
+					<button>Completed</button>
+				</li>
+			</ul>
+		);
+	}
+}
 
 export { TasksFilter };
