@@ -3,13 +3,21 @@ import React from "react";
 import { TasksFilter } from '../tasks-filter';
 import './footer.css';
 
-const Footer = () => {
+const Footer = ({ todoLength, filter, setFilter, deleteCompleted }) => {
 
 	return (
 		<div className="footer">
-			<span className="todo-count">1 items left</span>
-			<TasksFilter />
-			<button className="clear-completed">Clear completed</button>
+			<span className="todo-count">{todoLength} items left</span>
+			<TasksFilter
+				filter={filter}
+				setFilter={setFilter}
+			/>
+			<button
+				className="clear-completed"
+				onClick={deleteCompleted}
+			>
+				Clear completed
+			</button>
 		</div>
 	);
 

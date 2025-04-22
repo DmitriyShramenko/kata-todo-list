@@ -5,66 +5,117 @@ import { AppHeader } from '../app-header';
 import { NewTaskForm } from '../new-task-form';
 import { TaskList } from '../task-list';
 import { Footer } from '../footer';
-import { ItemAddForm } from '../item-add-form'
 
 const App = () => {
 
-	const [todoData, setTodoData] = useState([
-		{ label: 'Completed task', /*className: "completed",*/ id: 1 },
-		{ label: 'Editing task', /*className: "editing",*/ id: 2 },
-		{ label: 'Active task', /*className: "",*/ id: 3 }
+	const maxId = useRef(1); // useRef сохраняет значение между рендерами, но не вызывает перерисовку
+
+	const createTodoItem = (label) => { //переменная, создающая элемент
+		return {
+			label,
+			completed: false,
+			editing: false,
+			id: maxId.current++
+		}
+	}
+
+	const [todoData, setTodoData] = useState([ //стейт для тасков
+		createTodoItem('Completed task'),
+		createTodoItem('Editing task'),
+		createTodoItem('Active task')
 	]);
 
-	const deleteItem = (id) => {
+	const [filter, setFilter] = useState('all'); // стейт для фильтра
+
+	const getFilteredTodos = () => { //фильтрование элементов
+		switch (filter) {
+			case 'active':
+				return todoData.filter((item) => !item.completed)
+			case 'completed':
+				return todoData.filter((item) => item.completed)
+			default:
+				return todoData
+		}
+	};
+
+	const visibleTodos = getFilteredTodos();
+
+	const deleteCompleted = () => { //удаление завершенных элементов
+		setTodoData((prevTodoData) => {
+			return prevTodoData.filter((item) => !item.completed)
+		})
+	}
+
+	const deleteItem = (id) => { //удаление элемента
 		setTodoData((prevTodoData) => {
 
 			const idx = prevTodoData.findIndex((el) => el.id === id)
-			const newArr = [
+			return [
 				...prevTodoData.slice(0, idx),
 				...prevTodoData.slice(idx + 1)
 			]
-
-			return newArr
 		})
-	}
+	};
 
-	const maxId = useRef(100); // useRef сохраняет значение между рендерами, но не вызывает перерисовку
-
-	const addItem = (text) => {
-
-		const newEl = {
-			label: text,
-			id: maxId.current++
-		}
+	const addItem = (text) => { //добавление элемента
+		const newEl = createTodoItem(text)
 
 		setTodoData((prevTodoData) => {
 
-			const newArr = [
+			return [
 				...prevTodoData,
 				newEl
 			]
-
-			return newArr
 		})
-	}
+	};
+
+	function toggleProperty(arr, id, propName) { //функция, для выполнения и редактирования
+
+		const idx = arr.findIndex((el) => el.id === id) //находим индекс
+		const oldItem = arr[idx] //находим элемент списка
+		const newItem = { ...oldItem, [propName]: !oldItem[propName] } //создаем новый элемент, который имеет свойства старого
+
+		return [ //возвращаем новый массив, в который встраиваем новый элемент
+			...arr.slice(0, idx),
+			newItem,
+			...arr.slice(idx + 1)
+		]
+	};
+
+	const onToggleComplete = (id) => { //выполнение элемента
+		setTodoData((prevTodoData) => toggleProperty(prevTodoData, id, 'completed'))
+	};
+
+	const onToggleEdit = (id) => { //редактирование
+		setTodoData((prevTodoData) => toggleProperty(prevTodoData, id, 'editing'))
+	};
+
+	const itemsLeftCount = () => {
+		return todoData.filter((el) => !el.completed).length;
+	};
+
+	const itemsLeft = itemsLeftCount();
 
 	return (
 		<div className="todoapp">
-
 			<AppHeader />
-			<NewTaskForm />
-
+			<NewTaskForm onAdded={addItem} />
 			<div className="main">
 				<TaskList
-					todos={todoData}
-					onDeleted={deleteItem} />
-				<Footer />
-				<ItemAddForm onAdded={addItem} />
+					todos={visibleTodos}
+					onDeleted={deleteItem}
+					onToggleComplete={onToggleComplete}
+					onToggleEdit={onToggleEdit}
+				/>
+				<Footer
+					todoLength={itemsLeft}
+					filter={filter}
+					setFilter={setFilter}
+					deleteCompleted={deleteCompleted}
+				/>
 			</div>
-
 		</div>
 	);
-
-}
+};
 
 export { App };

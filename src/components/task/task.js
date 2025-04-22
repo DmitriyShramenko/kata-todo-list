@@ -1,17 +1,7 @@
 import React, { useState } from "react";
 import './task.css';
 
-const Task = ({ label, className, onDeleted }) => {
-	const [completed, setCompleted] = useState(false);
-	const [editing, setEditing] = useState(false);
-
-	const onLabelClick = () => {
-		setCompleted((prevCompleted) => !prevCompleted);
-	};
-
-	const editClick = () => {
-		setEditing((prevEditing) => !prevEditing);
-	};
+const Task = ({ label, className, onDeleted, onToggleComplete, onToggleEdit, completed, editing }) => {
 
 	let labelClass = 'description';
 	let createdClass = 'created';
@@ -31,16 +21,16 @@ const Task = ({ label, className, onDeleted }) => {
 
 		<li className={className}>
 
-			<input className="toggle" onClick={onLabelClick} type="checkbox" />
+			<input className="toggle" onClick={onToggleComplete} type="checkbox" />
 
 			<label>
-				<span className={labelClass} onClick={onLabelClick}>
+				<span className={labelClass} onClick={onToggleComplete}>
 					{label}
 				</span>
 				<button className={createdClass}>created 5 minutes ago</button>
 			</label>
 
-			<button className={editIconClass} onClick={editClick}></button>
+			<button className={editIconClass} onClick={onToggleEdit}></button>
 			<button className={destroyIconClass} onClick={onDeleted}></button>
 
 		</li>
