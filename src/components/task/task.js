@@ -1,40 +1,58 @@
 import React, { useState } from "react";
+import { formatDistanceToNow } from 'date-fns'
+
 import './task.css';
 
-const Task = ({ label, className, onDeleted, onToggleComplete, onToggleEdit, completed, editing }) => {
+const Task = ({ label, className, onDeleted, onToggleComplete, onToggleEdit, completed, editing, onUpdateLabel, createdAt }) => {
 
-	let labelClass = 'description';
-	let createdClass = 'created';
-	let editIconClass = 'icon icon-edit';
-	let destroyIconClass = 'icon icon-destroy';
+	let labelClass = completed ? 'description completed' : 'description';
+	let createdTime = formatDistanceToNow(new Date(createdAt), { addSuffix: true });
 
-	if (completed) {
-		labelClass += ' completed';
-	} else if (editing) {
-		labelClass += ' edit';
-		createdClass += ' hideEl';
-		editIconClass = '';
-		destroyIconClass = '';
+	const [newLabel, setNewLabel] = useState(label);
+
+	const handleChange = (e) => {
+		setNewLabel(e.target.value);
+	};
+
+	const handleSubmit = (e) => {
+		e.preventDefault();
+		onUpdateLabel(newLabel);
+	};
+
+	if (editing) {
+		return (
+			<li className={className}>
+				<form onSubmit={handleSubmit}>
+					<input
+						type="text"
+						className="edit"
+						value={newLabel}
+						onChange={handleChange}
+					/>
+				</form>
+			</li>
+		);
 	}
 
 	return (
-
 		<li className={className}>
-
-			<input className="toggle" onClick={onToggleComplete} type="checkbox" />
+			<input
+				className="toggle"
+				onChange={onToggleComplete}
+				type="checkbox"
+				checked={completed}
+			/>
 
 			<label>
 				<span className={labelClass} onClick={onToggleComplete}>
 					{label}
 				</span>
-				<button className={createdClass}>created 5 minutes ago</button>
+				<button className='created'>{`created ${createdTime}`}</button>
 			</label>
 
-			<button className={editIconClass} onClick={onToggleEdit}></button>
-			<button className={destroyIconClass} onClick={onDeleted}></button>
-
+			<button className='icon icon-edit' onClick={onToggleEdit}></button>
+			<button className='icon icon-destroy' onClick={onDeleted}></button>
 		</li>
-
 	);
 }
 

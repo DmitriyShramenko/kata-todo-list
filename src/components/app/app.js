@@ -1,4 +1,5 @@
 import React, { useState, useRef } from "react";
+import PropTypes from "prop-types";
 
 import './app.css';
 import { AppHeader } from '../app-header';
@@ -10,13 +11,20 @@ const App = () => {
 
 	const maxId = useRef(1); // useRef сохраняет значение между рендерами, но не вызывает перерисовку
 
-	const createTodoItem = (label) => { //переменная, создающая элемент
+	const createTodoItem = (label = 'New task') => { //переменная, создающая элемент
 		return {
 			label,
 			completed: false,
 			editing: false,
+			createdAt: new Date(),
 			id: maxId.current++
 		}
+	}
+
+	createTodoItem.PropTypes = {
+		label: PropTypes.string.isRequired,
+		completed: PropTypes.bool,
+		editing: PropTypes.bool
 	}
 
 	const [todoData, setTodoData] = useState([ //стейт для тасков
@@ -57,7 +65,7 @@ const App = () => {
 		})
 	};
 
-	const addItem = (text) => { //добавление элемента
+	const addItem = (text = 'Added task') => { //добавление элемента
 		const newEl = createTodoItem(text)
 
 		setTodoData((prevTodoData) => {
@@ -69,7 +77,7 @@ const App = () => {
 		})
 	};
 
-	function toggleProperty(arr, id, propName) { //функция, для выполнения и редактирования
+	function toggleProperty(arr, id, propName) { //функция для выполнения и редактирования
 
 		const idx = arr.findIndex((el) => el.id === id) //находим индекс
 		const oldItem = arr[idx] //находим элемент списка
@@ -90,6 +98,14 @@ const App = () => {
 		setTodoData((prevTodoData) => toggleProperty(prevTodoData, id, 'editing'))
 	};
 
+	const onUpdateLabel = (id, newLabel) => {
+		setTodoData((prevTodoData) =>
+			prevTodoData.map((item) =>
+				item.id === id ? { ...item, label: newLabel, editing: false } : item
+			)
+		);
+	};
+
 	const itemsLeftCount = () => {
 		return todoData.filter((el) => !el.completed).length;
 	};
@@ -106,6 +122,7 @@ const App = () => {
 					onDeleted={deleteItem}
 					onToggleComplete={onToggleComplete}
 					onToggleEdit={onToggleEdit}
+					onUpdateLabel={onUpdateLabel}
 				/>
 				<Footer
 					todoLength={itemsLeft}
