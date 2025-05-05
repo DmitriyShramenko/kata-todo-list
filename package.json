@@ -50,7 +50,7 @@
     "prettier": "^3.5.3"
   },
   "lint-staged": {
-    "*.js": [
+    "*.{js,jsx}": [
       "npm run lint:fix"
     ]
   }
